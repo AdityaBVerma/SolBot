@@ -6,7 +6,7 @@ const twilio = require("twilio");
 
 dotenv.config();
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 const client = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
 
