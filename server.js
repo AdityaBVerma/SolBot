@@ -13,17 +13,23 @@ const client = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
 let lastPrice = null;
 
 // Fetch Solana price
-async function fetchSOLPrice() {
+async function fetchSOLPrice(retries = 3) {
   try {
     const res = await axios.get(
-      "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd"
+      "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd",
+      { timeout: 5000 }
     );
     return res.data.solana.usd;
   } catch (err) {
-    console.error("Error fetching price:", err.message);
+    if (retries > 0) {
+      console.warn(`Retrying fetch... (${retries})`);
+      return fetchSOLPrice(retries - 1);
+    }
+    console.error("Error fetching price:", err.code || err.message);
     return null;
   }
 }
+
 
 // Send WhatsApp message
 async function sendWhatsAppMessage(msg) {
